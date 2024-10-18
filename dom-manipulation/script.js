@@ -20,10 +20,10 @@ let quotes = [
     
     if (newQuoteText && newQuoteCategory) {
       quotes.push({ text: newQuoteText, category: newQuoteCategory });
-      
+  
       // Update the quote display to show the new quote
       document.getElementById("quoteDisplay").innerHTML = `<p>"${newQuoteText}" - <em>Category: ${newQuoteCategory}</em></p>`;
-      
+  
       alert("Quote added successfully!");
   
       // Clear input fields after adding the quote
@@ -34,9 +34,24 @@ let quotes = [
     }
   }
   
+  // Function to create the form for adding quotes
+  function createAddQuoteForm() {
+    const formContainer = document.createElement('div');
+    formContainer.innerHTML = `
+      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+      <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+      <button id="addQuoteButton">Add Quote</button>
+    `;
+    document.body.appendChild(formContainer);
+  
+    // Add event listener to the new quote button
+    document.getElementById("addQuoteButton").addEventListener("click", addQuote);
+  }
+  
   // Event listener for the 'Show New Quote' button
   document.getElementById("newQuote").addEventListener("click", showRandomQuote);
   
-  // Initial display of a random quote
+  // Initialize the app by displaying a random quote and creating the add quote form
   showRandomQuote();
+  createAddQuoteForm();
   
