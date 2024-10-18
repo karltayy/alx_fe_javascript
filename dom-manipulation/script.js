@@ -119,6 +119,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   
       // Assuming the server responds with an array of quotes
       handleServerSync(serverQuotes);
+      showNotification("Quotes synced with server!"); // Notify user on sync
     } catch (error) {
       console.error('Error fetching quotes from server:', error);
     }
