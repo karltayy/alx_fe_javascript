@@ -251,5 +251,56 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   function exportQuotesToJson() {
     const dataStr = JSON.stringify(quotes, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quotes.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  
+  // Function to import quotes from a JSON file
+  function importFromJsonFile() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+  
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = (e) => {
+        try {
+          const importedQuotes = JSON.parse(e.target.result);
+          // Validate imported data structure
+          if (Array.isArray(importedQuotes)) {
+            quotes = importedQuotes;
+            saveQuotes(); // Save updated quotes to localStorage
+            categories = [...new Set(quotes.map(quote => quote.category))]; // Update categories
+            populateCategories(); // Update dropdown
+            showNotification("Quotes imported successfully!"); // Notify user
+            showRandomQuote(); // Show a random quote
+          } else {
+            showNotification("Invalid JSON format. Please provide an array of quotes.");
+          }
+        } catch (error) {
+          console.error('Error parsing JSON file:', error);
+          showNotification("Error parsing JSON file. Please check the file format.");
+        }
+      };
+  
+      reader.readAsText(file);
+    };
+  
+    fileInput.click(); // Simulate click to open file dialog
+  }
+  
+  // Initialize the application
+  window.onload = () => {
+    populateCategories(); // Populate categories on page load
+    createAddQuoteForm(); // Create add quote form
+    startServerSync(); // Start syncing with the server
+  };
   
