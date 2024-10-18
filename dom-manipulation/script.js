@@ -216,6 +216,37 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     }, 5000);
   }
   
+  // Function to create the form for adding a new quote
+  function createAddQuoteForm() {
+    const formContainer = document.getElementById("addQuoteForm");
+  
+    const form = document.createElement("form");
+    form.id = "quoteForm";
+  
+    const quoteTextInput = document.createElement("input");
+    quoteTextInput.type = "text";
+    quoteTextInput.id = "newQuoteText";
+    quoteTextInput.placeholder = "Enter your quote here...";
+    quoteTextInput.required = true;
+  
+    const categoryInput = document.createElement("input");
+    categoryInput.type = "text";
+    categoryInput.id = "newQuoteCategory";
+    categoryInput.placeholder = "Enter category...";
+    categoryInput.required = true;
+  
+    const submitButton = document.createElement("button");
+    submitButton.type = "button"; // Change to 'button' to prevent form submission
+    submitButton.innerText = "Add Quote";
+    submitButton.addEventListener("click", addQuote); // Call addQuote function on click
+  
+    // Append inputs and button to form
+    form.appendChild(quoteTextInput);
+    form.appendChild(categoryInput);
+    form.appendChild(submitButton);
+    formContainer.appendChild(form);
+  }
+  
   // Function to export quotes as a JSON file
   function exportQuotesToJson() {
     const dataStr = JSON.stringify(quotes, null, 2);
@@ -224,33 +255,5 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   
     const a = document.createElement('a');
     a.href = url;
-    a.download = "quotes.json";
-    a.click();
-  
-    URL.revokeObjectURL(url);
-  }
-  
-  // Function to import quotes from a JSON file
-  function importFromJsonFile(event) {
-    const fileReader = new FileReader();
-    fileReader.onload = function(event) {
-      const importedQuotes = JSON.parse(event.target.result);
-      quotes.push(...importedQuotes); // Merge imported quotes with existing ones
-  
-      // Update quotes and categories
-      saveQuotes();
-      categories = [...new Set(quotes.map(quote => quote.category))]; // Update categories
-      populateCategories();
-  
-      alert('Quotes imported successfully!');
-    };
-    fileReader.readAsText(event.target.files[0]);
-  }
-  
-  // Event listener for the 'Show New Quote' button
-  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-  
-  // Initialize the app by populating categories and creating the add quote form
-  populateCategories();
-  syncQuotes(); // Initial sync when the app starts
+   
   
