@@ -126,11 +126,13 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   
   // Function to periodically fetch server updates
   function startServerSync() {
-    setInterval(fetchQuotesFromServer, 30000); // Every 30 seconds
+    setInterval(syncQuotes, 30000); // Every 30 seconds
   }
   
-  // Start sync when the page loads
-  startServerSync();
+  // Function to sync local quotes with the server
+  async function syncQuotes() {
+    await fetchQuotesFromServer();
+  }
   
   // Function to handle synchronization between local and server data
   function handleServerSync(serverQuotes) {
@@ -246,4 +248,5 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   
   // Initialize the app by populating categories and creating the add quote form
   populateCategories();
+  syncQuotes(); // Initial sync when the app starts
   
