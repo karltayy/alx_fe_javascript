@@ -6,18 +6,57 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "You only live once, but if you do it right, once is enough.", category: "Life" }
   ];
   
-  // Function to display a random quote
-  function showRandomQuote() {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randomIndex];
+  // Initialize categories array from quotes
+  let categories = [...new Set(quotes.map(quote => quote.category))];
   
-    // Use sessionStorage to store the last viewed quote
-    sessionStorage.setItem('lastQuote', JSON.stringify(quote));
+  // Function to populate categories in the dropdown
+  function populateCategories() {
+    const categoryFilter = document.getElementById("categoryFilter");
+    
+    // Clear existing options
+    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+    
+    // Add categories to the dropdown
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      categoryFilter.appendChild(option);
+    });
   
-    document.getElementById("quoteDisplay").innerHTML = `<p>"${quote.text}" - <em>Category: ${quote.category}</em></p>`;
+    // Restore the last selected category from localStorage
+    const savedCategory = localStorage.getItem('selectedCategory');
+    if (savedCategory) {
+      categoryFilter.value = savedCategory;
+      filterQuotes(); // Apply the filter immediately
+    }
   }
   
-  // Function to add a new quote
+  // Function to filter quotes based on selected category
+  function filterQuotes() {
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    
+    // Save the selected category in localStorage
+    localStorage.setItem('selectedCategory', selectedCategory);
+  
+    let filteredQuotes = quotes;
+  
+    // Filter quotes based on the selected category, unless 'all' is selected
+    if (selectedCategory !== 'all') {
+      filteredQuotes = quotes.filter(quote => quote.category === selectedCategory);
+    }
+  
+    // Display a random quote from the filtered list
+    if (filteredQuotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+      const quote = filteredQuotes[randomIndex];
+      document.getElementById("quoteDisplay").innerHTML = `<p>"${quote.text}" - <em>Category: ${quote.category}</em></p>`;
+    } else {
+      document.getElementById("quoteDisplay").innerHTML = "<p>No quotes available in this category.</p>";
+    }
+  }
+  
+  // Function to add a new quote and update categories dynamically
   function addQuote() {
     const newQuoteText = document.getElementById("newQuoteText").value;
     const newQuoteCategory = document.getElementById("newQuoteCategory").value;
@@ -25,17 +64,20 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     if (newQuoteText && newQuoteCategory) {
       quotes.push({ text: newQuoteText, category: newQuoteCategory });
       
-      // Save quotes array to localStorage
+      // Update quotes in localStorage
       saveQuotes();
   
-      // Update the quote display to show the new quote
-      document.getElementById("quoteDisplay").innerHTML = `<p>"${newQuoteText}" - <em>Category: ${newQuoteCategory}</em></p>`;
-      
-      alert("Quote added successfully!");
+      // Check if the new category needs to be added to the dropdown
+      if (!categories.includes(newQuoteCategory)) {
+        categories.push(newQuoteCategory);
+        populateCategories(); // Update dropdown
+      }
   
       // Clear input fields after adding the quote
       document.getElementById("newQuoteText").value = "";
       document.getElementById("newQuoteCategory").value = "";
+      
+      alert("Quote added successfully!");
     } else {
       alert("Please fill out both fields.");
     }
@@ -67,8 +109,10 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
       const importedQuotes = JSON.parse(event.target.result);
       quotes.push(...importedQuotes); // Merge imported quotes with existing ones
   
-      // Save the merged quotes array to localStorage
+      // Update quotes and categories
       saveQuotes();
+      categories = [...new Set(quotes.map(quote => quote.category))]; // Update categories
+      populateCategories();
   
       alert('Quotes imported successfully!');
     };
@@ -98,15 +142,9 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   }
   
   // Event listener for the 'Show New Quote' button
-  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+  document.getElementById("newQuote").addEventListener("click", filterQuotes);
   
-  // Initialize the app by displaying a random quote and creating the add quote form
-  showRandomQuote();
+  // Initialize the app by populating categories and creating the add quote form
+  populateCategories();
   createAddQuoteForm();
-  
-  // Optionally, restore the last viewed quote from sessionStorage (if available)
-  if (sessionStorage.getItem('lastQuote')) {
-    const lastQuote = JSON.parse(sessionStorage.getItem('lastQuote'));
-    document.getElementById("quoteDisplay").innerHTML = `<p>"${lastQuote.text}" - <em>Category: ${lastQuote.category}</em></p>`;
-  }
   
