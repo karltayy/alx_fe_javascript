@@ -30,17 +30,13 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     const savedCategory = localStorage.getItem('selectedCategory');
     if (savedCategory) {
       categoryFilter.value = savedCategory;
-      filterQuotes(); // Apply the filter immediately
+      showRandomQuote(); // Show a random quote immediately
     }
   }
   
-  // Function to filter quotes based on selected category
-  function filterQuotes() {
+  // Function to display a random quote
+  function showRandomQuote() {
     const selectedCategory = document.getElementById("categoryFilter").value;
-    
-    // Save the selected category in localStorage
-    localStorage.setItem('selectedCategory', selectedCategory);
-  
     let filteredQuotes = quotes;
   
     // Filter quotes based on the selected category, unless 'all' is selected
@@ -56,6 +52,13 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     } else {
       document.getElementById("quoteDisplay").innerHTML = "<p>No quotes available in this category.</p>";
     }
+  }
+  
+  // Function to filter quotes based on selected category
+  function filterQuotes() {
+    // Save the selected category in localStorage
+    localStorage.setItem('selectedCategory', document.getElementById("categoryFilter").value);
+    showRandomQuote(); // Call the showRandomQuote function to display the quote
   }
   
   // Function to add a new quote and update categories dynamically
@@ -148,7 +151,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     // Re-populate categories and update the UI
     categories = [...new Set(mergedQuotes.map(quote => quote.category))];
     populateCategories();
-    filterQuotes();
+    showRandomQuote();
   }
   
   // Simple merging logic where server data takes precedence
@@ -245,7 +248,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   }
   
   // Event listener for the 'Show New Quote' button
-  document.getElementById("newQuote").addEventListener("click", filterQuotes);
+  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
   
   // Initialize the app by populating categories and creating the add quote form
   populateCategories();
